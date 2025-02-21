@@ -8,9 +8,10 @@ def check_float(newval):
     if newval == "":
         return True
     return (
-        re.match(r"^\d*$", newval) is not None
-        and int(newval) <= 256000
-        and int(newval) >= 1000
+        re.match(r"^\d*$", newval)
+        is not None
+        # and int(newval) <= 256000
+        # and int(newval) >= 1000
     )
 
 
@@ -26,11 +27,37 @@ def on_stop_freq_change(event, i):
         start_freq[i + 1].set(stop_freq[i].get())
 
 
-vco = ttk.LabelFrame(root, text="VCO Limits and Comparators", padding=(12, 12, 12, 12))
-vco.grid(column=1, row=1, sticky="w")
+def on_duration_change(event, i):
+    max_duration = 1310.7 if delay[i].get() else 655.35
+    current_value = float(duration[i].get())
+
+    if current_value > max_duration:
+        duration[i].set(str(max_duration))
+
+
+def on_next_ramp_select(event, i):
+    next_ramp[i].set(next_ramp_combo[i].get())
+
+
+def on_trigger_select(event, i):
+    trigger[i].set(trigger_combo[i].current())
+
+root.title("Configure Signal Generetor")
+
+top = ttk.LabelFrame(root)
+top.grid(column=1, row=1, columnspan=3, sticky="w")
+
+icon = ttk.Frame(top)
+icon.grid(column=0, row=1, sticky="w")
+
+vco = ttk.LabelFrame(top, text="VCO Limits and Comparators")
+vco.grid(column=1, row=1, sticky="e")
 
 ramp = ttk.LabelFrame(root, text="Ramp Parameters", padding=(12, 12, 12, 12))
 ramp.grid(column=1, row=7, sticky="w")
+
+# Icon
+Label(icon, image=logo, justify="center").grid(column=0, row=0, sticky="e")
 
 # Start Frequency
 ttk.Label(vco, text="VCO Start Frequency").grid(
@@ -128,7 +155,11 @@ ttk.Checkbutton(ramp, text="Ramp Enable", variable=ramp_enable).grid(
 
 for i in range(0, 8):
     ttk.Label(ramp, text=ramp_label[i], justify="center").grid(
-        row=1, column=i, pady=5, padx=15, sticky="ns",
+        row=1,
+        column=i,
+        pady=5,
+        padx=15,
+        sticky="ns",
     )
 
     ttk.Label(ramp, text=i).grid(row=i + 2, column=0, pady=5, padx=10, sticky="ns")
@@ -151,5 +182,68 @@ for i in range(0, 8):
     stop_freq_entry[i].bind(
         "<FocusOut>", lambda event, id=i: on_stop_freq_change(event, id)
     )
+
+    duration_entry[i] = ttk.Entry(
+        ramp,
+        textvariable=duration[i],
+        validate="key",
+        validatecommand=check_float_wrapper,
+        justify="center",
+        width=8,
+    )
+    duration_entry[i].grid(row=i + 2, column=3, pady=5, padx=10, sticky="ns")
+    duration_entry[i].bind(
+        "<FocusOut>", lambda event, id=i: on_duration_change(event, id)
+    )
+
+    delay_box[i] = ttk.Checkbutton(
+        ramp,
+        variable=delay[i],
+        command=lambda event, id=i: on_duration_change(event, id),
+    )
+    delay_box[i].grid(row=i + 2, column=4, pady=5, padx=10, sticky="ns")
+
+    next_ramp_combo[i] = ttk.Combobox(
+        ramp,
+        values=ramp_options,
+        state="readonly",
+        width=2,
+    )
+    next_ramp_combo[i].grid(
+        row=i + 2,
+        column=5,
+        pady=5,
+        padx=10,
+        sticky="ns",
+    )
+    next_ramp_combo[i].current(0)
+    next_ramp_combo[i].bind(
+        "<<ComboboxSelected>>", lambda event, id=i: on_next_ramp_select(event, id)
+    )
+
+    reset_box[i] = ttk.Checkbutton(
+        ramp,
+        variable=reset[i],
+    )
+    reset_box[i].grid(row=i + 2, column=6, pady=5, padx=10, sticky="ns")
+
+    trigger_combo[i] = ttk.Combobox(
+        ramp,
+        values=trigger_options,
+        state="readonly",
+        width=10,
+    )
+    trigger_combo[i].grid(
+        row=i + 2,
+        column=7,
+        pady=5,
+        padx=10,
+        sticky="ns",
+    )
+    trigger_combo[i].current(0)
+    trigger_combo[i].bind(
+        "<<ComboboxSelected>>", lambda event, id=i: on_trigger_select(event, id)
+    )
+
 
 root.mainloop()
