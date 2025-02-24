@@ -20,15 +20,18 @@ ramp_options = [0, 1, 2, 3, 4, 5, 6, 7]
 
 trigger_options = ["None", "Flag 1", "Flag 2", "Flag 1 & 2"]
 
+button_display_text = " After completing the configuration\nclick Done to download the\nconfiguration CSV file"
+
 # Logo
 logo = PhotoImage(file="logo.png")
 
 # VCO Config
 vco_start = StringVar(value=10000)
-vco_high = StringVar()
-vco_low = StringVar()
-max_flag = StringVar()
-min_flag = StringVar()
+vco_high = StringVar(value=12000)
+vco_low = StringVar(value=9000)
+max_flag = StringVar(value=9800)
+min_flag = StringVar(value=9400)
+file_name = StringVar(value="config")
 
 # Ramp Config
 ramp_enable = BooleanVar()
