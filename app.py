@@ -49,20 +49,26 @@ def on_trigger_select(event, i):
 
 root.title("Configure Signal Generetor")
 
-top = ttk.LabelFrame(root)
-top.grid(column=1, row=1, columnspan=3, sticky="w")
+top = ttk.LabelFrame(
+    root, text="VCO Limits and Comparators", labelanchor="n", padding=(12, 12, 12, 12)
+)
+top.grid(column=1, row=1, columnspan=3)
 
 icon = ttk.Frame(top)
 icon.grid(column=0, row=1, sticky="w")
 
-vco = ttk.LabelFrame(top, text="VCO Limits and Comparators")
+vco = ttk.Frame(top)
 vco.grid(column=1, row=1, sticky="e")
 
-ramp = ttk.LabelFrame(root, text="Ramp Parameters", padding=(12, 12, 12, 12))
+ramp = ttk.LabelFrame(
+    root, text="Ramp Parameters", labelanchor="n", padding=(12, 12, 12, 12)
+)
 ramp.grid(column=1, row=7, sticky="w")
 
 # Icon
 Label(icon, image=logo, justify="center").grid(column=0, row=0, sticky="e")
+
+ttk.Separator(top, orient=VERTICAL).place(relx=0.5, rely=0, relheight=1)
 
 # Start Frequency
 ttk.Label(vco, text="VCO Start Frequency").grid(
@@ -204,7 +210,7 @@ for i in range(0, 8):
     delay_box[i] = ttk.Checkbutton(
         ramp,
         variable=delay[i],
-        command=lambda event, id=i: on_duration_change(event, id),
+        command=lambda id=i: on_duration_change(None, id),
     )
     delay_box[i].grid(row=i + 2, column=4, pady=5, padx=10, sticky="ns")
 
