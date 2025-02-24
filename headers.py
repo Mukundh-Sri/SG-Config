@@ -13,7 +13,7 @@ ramp_label = [
     "Delay",
     "Next Ramp",
     "Reset",
-    "Trigger",
+    "Output\nTrigger",
 ]
 
 ramp_options = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -32,14 +32,15 @@ min_flag = StringVar()
 
 # Ramp Config
 ramp_enable = BooleanVar()
-start_freq = [StringVar(value=vco_start.get()) for i in range(0, 8)]
-stop_freq = [StringVar(value=vco_start.get()) for i in range(0, 8)]
-duration = [StringVar(value=100) for i in range(0, 8)]
+start_freq = [StringVar(value=vco_start.get()) for _ in range(0, 8)]
+stop_freq = [StringVar(value=9000) for _ in range(0, 8)]
+duration = [StringVar(value=655.35) for _ in range(0, 8)]
 delay = [IntVar(value=0) for _ in range(8)]
-next_ramp = [StringVar(value=0) for _ in range(8)]
+next_ramp = [StringVar(value=i) for i in range(8)]
 reset = [BooleanVar(value=False) for _ in range(8)]
 trigger = [IntVar(value=0) for _ in range(8)]
 
+# Ramp Config Dissplay Elements
 start_freq_label = [ttk.Label() for i in range(0, 8)]
 stop_freq_entry = [ttk.Entry() for i in range(0, 8)]
 duration_entry = [ttk.Entry() for i in range(0, 8)]
