@@ -7,15 +7,19 @@ from headers import *
 def check_float(newval):
     if newval == "":
         return True
-    return (
-        re.match(r"^\d*$", newval)
-        is not None
-        # and int(newval) <= 256000
-        # and int(newval) >= 1000
-    )
+    return re.match(r"^\d*$", newval) is not None
 
 
 check_float_wrapper = (root.register(check_float), "%P")
+
+
+def check_freq(newval):
+    if newval == "":
+        return True
+    return re.match(r"^\d*$", newval) is not None and int(newval) <= 256000
+
+
+check_freq_wrapper = (root.register(check_freq), "%P")
 
 
 def on_vco_start_change(event):
@@ -42,6 +46,7 @@ def on_next_ramp_select(event, i):
 def on_trigger_select(event, i):
     trigger[i].set(trigger_combo[i].current())
 
+
 root.title("Configure Signal Generetor")
 
 top = ttk.LabelFrame(root)
@@ -67,7 +72,7 @@ vco_start_entry = ttk.Entry(
     vco,
     textvariable=vco_start,
     validate="key",
-    validatecommand=check_float_wrapper,
+    validatecommand=check_freq_wrapper,
     width=8,
     justify="center",
 )
@@ -89,7 +94,7 @@ ttk.Entry(
     vco,
     textvariable=vco_high,
     validate="key",
-    validatecommand=check_float_wrapper,
+    validatecommand=check_freq_wrapper,
     width=8,
     justify="center",
 ).grid(column=4, row=1, columnspan=1, pady=5, padx=5)
@@ -105,7 +110,7 @@ ttk.Entry(
     vco,
     textvariable=vco_low,
     validate="key",
-    validatecommand=check_float_wrapper,
+    validatecommand=check_freq_wrapper,
     width=8,
     justify="center",
 ).grid(column=4, row=2, columnspan=1, pady=5, padx=5)
@@ -124,7 +129,7 @@ ttk.Entry(
     vco,
     textvariable=max_flag,
     validate="key",
-    validatecommand=check_float_wrapper,
+    validatecommand=check_freq_wrapper,
     width=8,
     justify="center",
 ).grid(column=4, row=4, columnspan=1, pady=5, padx=5)
@@ -140,7 +145,7 @@ ttk.Entry(
     vco,
     textvariable=min_flag,
     validate="key",
-    validatecommand=check_float_wrapper,
+    validatecommand=check_freq_wrapper,
     width=8,
 ).grid(column=4, row=5, columnspan=1, pady=5, padx=5)
 ttk.Label(vco, text="MHz").grid(
@@ -174,7 +179,7 @@ for i in range(0, 8):
         ramp,
         textvariable=stop_freq[i],
         validate="key",
-        validatecommand=check_float_wrapper,
+        validatecommand=check_freq_wrapper,
         justify="center",
         width=8,
     )
