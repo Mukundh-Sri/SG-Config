@@ -139,12 +139,12 @@ ttk.Label(vco, text="MHz").grid(
 )
 
 # Ramp High Comparator
-ttk.Label(vco, text="Max Ramp Flag").grid(
+ttk.Label(vco, text="CMP0 Flag").grid(
     column=0, row=4, columnspan=2, pady=5, padx=5, sticky="e"
 )
 ttk.Entry(
     vco,
-    textvariable=max_flag,
+    textvariable=cmp0_flag,
     validate="key",
     validatecommand=check_freq_wrapper,
     width=8,
@@ -155,12 +155,12 @@ ttk.Label(vco, text="MHz").grid(
 )
 
 # Ramp Low Comparator
-ttk.Label(vco, text="Min Ramp Flag").grid(
+ttk.Label(vco, text="CMP1 Flag").grid(
     column=0, row=5, columnspan=2, pady=5, padx=5, sticky="e"
 )
 ttk.Entry(
     vco,
-    textvariable=min_flag,
+    textvariable=cmp1_flag,
     validate="key",
     validatecommand=check_freq_wrapper,
     width=8,

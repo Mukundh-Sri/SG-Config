@@ -29,8 +29,8 @@ logo = PhotoImage(file="logo.png")
 vco_start = StringVar(value=10000)
 vco_high = StringVar(value=12000)
 vco_low = StringVar(value=9000)
-max_flag = StringVar(value=9800)
-min_flag = StringVar(value=9400)
+cmp0_flag = StringVar(value=9800)
+cmp1_flag = StringVar(value=9400)
 file_name = StringVar(value="config")
 
 # Ramp Config

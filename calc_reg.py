@@ -7,7 +7,12 @@ local_reg = list(REGISTER_MAP)
 
 def split_to_8bit_hex(value):
     hex_str = f"{value:x}".zfill((len(f"{value:x}") + 1) // 2 * 2)
-    return [hex_str[i : i + 2] for i in range(0, len(hex_str), 2)]
+    hex_list = [hex_str[i : i + 2] for i in range(0, len(hex_str), 2)]
+
+    while len(hex_list) < 4:
+        hex_list.insert(0, "00")
+
+    return hex_list[-4:]
 
 
 def dec_to_bin_str(value):
@@ -36,24 +41,39 @@ def set_reg(name):
     )
     cmp0 = split_to_8bit_hex(
         twos_complement(
-            ((int(max_flag.get()) - int(vco_start.get())) * 2**24) / 100, 33
-        )
-    )
-    cmp1 = split_to_8bit_hex(
-        twos_complement(
-            ((int(min_flag.get()) - int(vco_start.get())) * 2**24) / 100, 33
+            ((int(cmp0_flag.get()) - int(vco_start.get())) * 2**24) / 100, 33
         )
     )
 
+    cmp1 = split_to_8bit_hex(
+        twos_complement(
+            ((int(cmp1_flag.get()) - int(vco_start.get())) * 2**24) / 100, 33
+        )
+    )
+
+    sign = int(
+        (
+            "0b000"
+            + ("0" if int(vco_high.get()) > int(vco_start.get()) else "1")
+            + ("0" if int(vco_low.get()) > int(vco_start.get()) else "1")
+            + "0"
+            + ("0" if int(cmp1_flag.get()) > int(vco_start.get()) else "1")
+            + ("0" if int(cmp0_flag.get()) > int(vco_start.get()) else "1")
+        ),
+        2,
+    )
+
+    local_reg[70] = (local_reg[70] & 0xFFFF00) + sign
+
     for i in range(0, 4):
-        local_reg[78 - i] = (local_reg[78 - i] & 0xFFFF00) + int(high[i], 16)
-        local_reg[82 - i] = (local_reg[78 - i] & 0xFFFF00) + int(low[i], 16)
-        local_reg[67 - i] = (local_reg[78 - i] & 0xFFFF00) + int(cmp1[i], 16)
-        local_reg[63 - i] = (local_reg[78 - i] & 0xFFFF00) + int(cmp0[i], 16)
+        local_reg[78 - i] = (local_reg[78 - i] & 0xFFFF00) + int(low[i], 16)
+        local_reg[82 - i] = (local_reg[82 - i] & 0xFFFF00) + int(high[i], 16)
+        local_reg[68 - i] = (local_reg[68 - i] & 0xFFFF00) + int(cmp1[i], 16)
+        local_reg[63 - i] = (local_reg[63 - i] & 0xFFFF00) + int(cmp0[i], 16)
 
     # Set Ramp Properties
     if ramp_enable.get():
-        local_reg[58] = local_reg[58] & 0xFFFFF0 + 0x1
+        local_reg[58] = (local_reg[58] & 0xFFFFF0) + 0x1
         for i in range(0, 8):
             d = int(delay[i].get()) + 1
             # Increment
@@ -78,30 +98,33 @@ def set_reg(name):
                 int("0x" + inc[0], 16) + int("0b" + str((d - 1) * 10 + 0) + "000000", 2)
             )[2:]
 
-            print(inc)
-
-            for i in range(0, 4):
-                print(int(inc[3 - i], 16))
-                local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + i] = (
-                    local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + i] & 0xFFFF00
-                ) + int(inc[3 - i], 16)
+            for j in range(0, 4):
+                local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + j] = (
+                    local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + j] & 0xFFFF00
+                ) + int(inc[3 - j], 16)
 
             # Length
-            len = split_to_8bit_hex(int((float(duration[i].get()) * FPD // d)))
+            length = split_to_8bit_hex(int((float(duration[i].get()) * FPD // d)))
             local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + 4] = (
                 local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + 4] & 0xFFFF00
-            ) + int(len[1], 16)
+            ) + int(length[3], 16)
             local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + 5] = (
                 local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + 5] & 0xFFFF00
-            ) + int(len[0], 16)
+            ) + int(length[2], 16)
 
             # Auxilary Information
+
+            trig = (
+                dec_to_bin_str(trigger[i].get())
+                if len(dec_to_bin_str(trigger[i].get())) == 2
+                else ("0" + dec_to_bin_str(trigger[i].get()))
+            )
             aux = (
                 "0b"
                 + dec_to_bin_str(next_ramp[i].get())
                 + "00"
                 + dec_to_bin_str(reset[i].get())
-                + dec_to_bin_str(trigger[i].get())
+                + trig
             )
 
             local_reg[RAMP_REG_START + i * RAMP_REG_NEXT + 6] = (
