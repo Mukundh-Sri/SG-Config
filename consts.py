@@ -1,3 +1,5 @@
+import numpy as np
+
 FPD: int = 100
 
 RAMP_REG_START: int = 86
@@ -50,17 +52,17 @@ REGISTER_MAP = (
     0x002B00,
     0x002C00,
     0x002D00,
-    0x002E00,
-    0x002F00,
-    0x003000,
-    0x003100,
-    0x003200,
-    0x003300,
-    0x003400,
-    0x003500,
-    0x003600,
-    0x003700,
-    0x003800,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
+    np.nan,
     0x003900,
     0x003A00,
     0x003B00,

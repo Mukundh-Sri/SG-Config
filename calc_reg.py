@@ -1,6 +1,7 @@
 from consts import *
 from headers import *
 import csv
+import numpy as np
 
 local_reg = list(REGISTER_MAP)
 
@@ -137,6 +138,12 @@ def set_reg(name):
         writer = csv.writer(file)
         writer.writerow(["Register", "Value (Hex)"])  # CSV header
         for index, value in enumerate(local_reg):
-            writer.writerow(
-                [f"R{index}", f"0x{value:06X}"]
-            )  # Ensures 6-digit hex with uppercase
+            if isinstance(value, int):
+                writer.writerow(
+                    [f"R{index}", f"0x{value:06X}"]
+                )  # Ensures 6-digit hex with uppercase
+            else:
+                pass
+
+
+set_reg("config.csv")
